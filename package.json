@@ -1,0 +1,31 @@
+{
+  "name": "weather-system-rig",
+  "version": "1.0.0",
+  "description": "Weather System - RIG: Real-Time In-Game Weather Management System",
+  "private": true,
+  "workspaces": [
+    "realtime-weather-server"
+  ],
+  "scripts": {
+    "install-all": "npm install && npm --prefix realtime-weather-server install",
+    "build": "npm --prefix realtime-weather-server run build",
+    "start": "npm --prefix realtime-weather-server start",
+    "dev": "npm --prefix realtime-weather-server run dev",
+    "test": "npm --prefix realtime-weather-server test",
+    "lint": "npm --prefix realtime-weather-server run lint"
+  },
+  "keywords": [
+    "weather",
+    "game",
+    "real-time",
+    "websocket",
+    "nodejs",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📅 Weather Forecast - Weather System - RIG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            color: white;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .forecast-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .forecast-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .forecast-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .forecast-time {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .forecast-emoji {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+
+        .forecast-temp {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .forecast-details {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .forecast-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .api-info {
+            background: #f0f7ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .api-info-label {
+            color: #1976D2;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .api-code {
+            background: #fff;
+            border: 1px solid #2196F3;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fff5f5;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            color: #c62828;
+        }
+
+        .summary {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+
+        .summary-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .forecast-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .forecast-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📅 Прогноз Погоды</h1>
+            </div>
+            <button class="back-btn" onclick="goHome()">← Назад</button>
+        </div>
+
+        <div class="forecast-card">
+            <h3 style="margin-bottom: 20px;">📊 Сводка</h3>
+            <div class="summary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Средняя температура</div>
+                        <div class="summary-value" id="avgTemp">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Максимальная</div>
+                        <div class="summary-value" id="maxTemp">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Минимальная</div>
+                        <div class="summary-value" id="minTemp">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Вероятность осадков</div>
+                        <div class="summary-value" id="rainProb">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="forecast-card">
+            <h3 style="margin-bottom: 20px;">🌦️ Прогноз на 6 дней</h3>
+            <div id="forecastContainer" style="text-align: center;">
+                <div class="loading"></div> Загрузка данных...
+            </div>
+        </div>
+
+        <div class="forecast-card">
+            <h3 style="margin-bottom: 15px;">📊 API Информация</h3>
+            <div class="api-info">
+                <div class="api-info-label">Endpoint</div>
+                <div class="api-code">/api/weather/forecast</div>
+            </div>
+            <div class="api-info">
+                <div class="api-info-label">Метод</div>
+                <div class="api-code">GET</div>
+            </div>
+            <div class="api-info">
+                <div class="api-info-label">Описание</div>
+                <div class="api-code">Получает 6-дневный прогноз погоды с почасовыми обновлениями</div>
+            </div>
+        </div>
+
+        <div class="controls" style="justify-content: center;">
+            <button class="btn btn-primary" onclick="loadForecast()">
+                <span>🔄</span> Обновить
+            </button>
+            <button class="btn btn-secondary" onclick="copyEndpoint()">
+                <span>📋</span> Копировать URL
+            </button>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <script>
+        function loadForecast() {
+            const container = document.getElementById('forecastContainer');
+            container.innerHTML = '<div class="loading"></div> Загрузка данных...';
+
+            fetch('/api/weather/forecast')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        const forecast = data.data;
+                        
+                        // Calculate summary
+                        const temps = forecast.map(f => f.temperature);
+                        const avgTemp = (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1);
+                        const maxTemp = Math.max(...temps).toFixed(1);
+                        const minTemp = Math.min(...temps).toFixed(1);
+                        const rainProb = Math.round(Math.random() * 50);
+
+                        document.getElementById('avgTemp').textContent = avgTemp + 'C';
+                        document.getElementById('maxTemp').textContent = maxTemp + 'C';
+                        document.getElementById('minTemp').textContent = minTemp + 'C';
+                        document.getElementById('rainProb').textContent = rainProb + '%';
+
+                        // Build forecast items
+                        let html = '<div class="forecast-grid">';
+                        forecast.forEach((item, index) => {
+                            const date = new Date(Date.now() + index * 24 * 60 * 60 * 1000);
+                            const dayName = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][date.getDay()];
+                            const dateStr = `${dayName}, ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth()+1).toString().padStart(2, '0')}`;
+                            
+                            html += `
+                                <div class="forecast-item">
+                                    <div class="forecast-time">${dateStr}</div>
+                                    <div class="forecast-emoji">${getWeatherEmoji(item.type)}</div>
+                                    <div class="forecast-temp">${item.temperature.toFixed(1)}C</div>
+                                    <div class="forecast-details">
+                                        <div class="forecast-detail-row">
+                                            <span>💧 Humidity:</span>
+                                            <span>${item.humidity.toFixed(0)}%</span>
+                                        </div>
+                                        <div class="forecast-detail-row">
+                                            <span>💨 Wind:</span>
+                                            <span>${item.windSpeed.toFixed(1)} m/s</span>
+                                        </div>
+                                        <div class="forecast-detail-row">
+                                            <span>👁️ Visibility:</span>
+                                            <span>${(item.visibility/1000).toFixed(1)} km</span>
+                                        </div>
+                                        <div class="forecast-detail-row">
+                                            <span>📊 Pressure:</span>
+                                            <span>${item.pressure.toFixed(0)} mb</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        
+                        container.innerHTML = html;
+                        updateTimestamp();
+                    } else {
+                        container.innerHTML = '<div class="error-message">❌ Error: Invalid response from server</div>';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = `<div class="error-message">❌ Error loading: ${error.message}</div>`;
+                });
+        }
+
+        function getWeatherEmoji(type) {
+            const emojis = {
+                'sunny': '☀️',
+                'rainy': '🌧️',
+                'snowy': '❄️',
+                'foggy': '🌫️',
+                'stormy': '⛈️',
+                'cloudy': '☁️'
+            };
+            return emojis[type] || '🌤️';
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = 
+                `🕐 Updated: ${now.toLocaleString('ru-RU')}`;
+        }
+
+        function copyEndpoint() {
+            const fullUrl = window.location.origin + '/api/weather/forecast';
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('URL    !');
+            }).catch(err => {
+                console.error(' :', err);
+            });
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Auto-reload every 10 seconds
+        window.addEventListener('load', () => {
+            loadForecast();
+            setInterval(loadForecast, 10000);
+        });
+    </script>
+</body>
+</html>
+

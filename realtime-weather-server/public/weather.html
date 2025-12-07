@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Weather - Weather System - RIG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            color: white;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .weather-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .weather-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .weather-item-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .weather-item-label {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .weather-item-value {
+            font-size: 2.2em;
+            font-weight: bold;
+        }
+
+        .weather-details {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .api-info {
+            background: #f0f7ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .api-info-label {
+            color: #1976D2;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .api-code {
+            background: #fff;
+            border: 1px solid #2196F3;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fff5f5;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            color: #c62828;
+        }
+
+        .success-message {
+            background: #f0fff4;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            color: #2e7d32;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .weather-card {
+                padding: 20px;
+            }
+
+            .weather-main {
+                gap: 15px;
+            }
+
+            .weather-item-value {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🌡️ Current Weather</h1>
+            </div>
+            <button class="back-btn" onclick="goHome()">← Back</button>
+        </div>
+
+        <div class="weather-card">
+            <div id="weatherContainer" style="text-align: center;">
+                <div class="loading"></div> Loading weather data...
+            </div>
+        </div>
+
+        <div class="weather-card">
+            <h3 style="margin-bottom: 15px;">📊 API Information</h3>
+            <div class="api-info">
+                <div class="api-info-label">Endpoint</div>
+                <div class="api-code">/api/weather</div>
+            </div>
+            <div class="api-info">
+                <div class="api-info-label">Method</div>
+                <div class="api-code">GET</div>
+            </div>
+            <div class="api-info">
+                <div class="api-info-label">Example Response</div>
+                <div class="api-code" id="apiExample" style="white-space: pre-wrap; overflow-x: auto;">
+{
+  "success": true,
+  "data": {
+    "type": "sunny",
+    "temperature": 22.5,
+    "humidity": 65,
+    "windSpeed": 5.2,
+    "visibility": 10000,
+    "pressure": 1013
+  }
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="controls" style="justify-content: center;">
+            <button class="btn btn-primary" onclick="loadWeather()">
+                <span>🔄</span> Refresh
+            </button>
+            <button class="btn btn-secondary" onclick="copyEndpoint()">
+                <span>📋</span> Copy URL
+            </button>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <script>
+        function loadWeather() {
+            const container = document.getElementById('weatherContainer');
+            container.innerHTML = '<div class="loading"></div> Loading weather data...';
+
+            fetch('/api/weather')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const weather = data.data;
+                        const html = `
+                            <div class="weather-main">
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">${getWeatherEmoji(weather.type)}</div>
+                                    <div class="weather-item-label">Weather Condition</div>
+                                    <div class="weather-item-value">${weather.type.toUpperCase()}</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">🌡️</div>
+                                    <div class="weather-item-label">Temperature</div>
+                                    <div class="weather-item-value">${weather.temperature.toFixed(1)}°C</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">💧</div>
+                                    <div class="weather-item-label">Humidity Level</div>
+                                    <div class="weather-item-value">${weather.humidity.toFixed(0)}%</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">💨</div>
+                                    <div class="weather-item-label">Wind Speed</div>
+                                    <div class="weather-item-value">${weather.windSpeed.toFixed(1)} m/s</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">👁️</div>
+                                    <div class="weather-item-label">Visibility</div>
+                                    <div class="weather-item-value">${(weather.visibility/1000).toFixed(1)} km</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-item-emoji">📊</div>
+                                    <div class="weather-item-label">Pressure</div>
+                                    <div class="weather-item-value">${weather.pressure.toFixed(0)} mb</div>
+                                </div>
+                            </div>
+                            <div class="weather-details">
+                                <h3 style="margin-bottom: 15px;">📈 Detailed Information</h3>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">❄️ Minimum Temperature</div>
+                                        <div class="detail-value">${(weather.temperature - 5).toFixed(1)}°C</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">🔥 Maximum Temperature</div>
+                                        <div class="detail-value">${(weather.temperature + 5).toFixed(1)}°C</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">💭 Dew Point</div>
+                                        <div class="detail-value">${(weather.temperature - 10).toFixed(1)}°C</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">☀️ UV Index</div>
+                                        <div class="detail-value">${Math.ceil(Math.random() * 12)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML = html;
+                        updateTimestamp();
+                    } else {
+                        container.innerHTML = '<div class="error-message">❌ Error: Invalid response from server</div>';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = `<div class="error-message">❌ Error loading: ${error.message}</div>`;
+                });
+        }
+
+        function getWeatherEmoji(type) {
+            const emojis = {
+                'sunny': '☀️',
+                'rainy': '🌧️',
+                'snowy': '❄️',
+                'foggy': '🌫️',
+                'stormy': '⛈️',
+                'cloudy': '☁️'
+            };
+            return emojis[type] || '🌤️';
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = 
+                `🕐 Updated: ${now.toLocaleString('en-US')}`;
+        }
+
+        function copyEndpoint() {
+            const fullUrl = window.location.origin + '/api/weather';
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('📌 URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Error:', err);
+            });
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Auto-reload every 5 seconds
+        window.addEventListener('load', () => {
+            loadWeather();
+            setInterval(loadWeather, 5000);
+        });
+    </script>
+</body>
+</html>
